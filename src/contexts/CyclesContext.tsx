@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useReducer, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useEffect,
+  useReducer,
+  useState,
+  type ReactNode,
+} from "react";
 
 interface CreateCycleData {
   task: string;
@@ -80,14 +86,40 @@ export function CyclesContextProvider({
     {
       cycles: [],
       activeCycleId: null,
+    },
+    (initialState) => {
+      const storedStateAsJSON = localStorage.getItem(
+        "@timer-pomodoro:cycles-state-1.0.0"
+      );
+
+      if (storedStateAsJSON) {
+        return JSON.parse(storedStateAsJSON);
+      }
+
+      return initialState;
     }
   );
 
-  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
-
   const { cycles, activeCycleId } = cyclesState;
-
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
+
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(() => {
+    if (activeCycle) {
+      return (
+        (Number(new Date().getTime()) -
+          new Date(activeCycle.startDate).getTime()) /
+        1000
+      );
+    }
+
+    return 0;
+  });
+
+  useEffect(() => {
+    const stateJSON = JSON.stringify(cyclesState);
+
+    localStorage.setItem("@timer-pomodoro:cycles-state-1.0.0", stateJSON);
+  }, [cyclesState]);
 
   function setSecondsPassed(seconds: number) {
     setAmountSecondsPassed(seconds);
