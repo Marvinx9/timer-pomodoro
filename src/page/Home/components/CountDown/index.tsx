@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import { CountDownContainer, Separator } from "./styles";
-import { CyclesContext } from "../..";
+import { CyclesContext } from "../../../../contexts/CyclesContext";
 
 export function CountDown() {
   const {
